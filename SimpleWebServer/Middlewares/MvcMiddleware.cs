@@ -8,6 +8,7 @@ using System.Net;
 using System.Reflection;
 using System.Web;
 using Autofac;
+using SimpleWebServer.Attributes;
 using SimpleWebServer.Exceptions;
 
 namespace SimpleWebServer.Middlewares
@@ -65,9 +66,13 @@ namespace SimpleWebServer.Middlewares
 
             ParameterInfo[] methodParams = actionMethod.GetParameters();
             if (methodParams.Length == 0)
-            {
                 return actionMethod.Invoke(container.Resolve(controllerType), null).ToString();
-            }
+
+            HttpMethodAttribute methoAttr = actionMethod.GetCustomAttribute<HttpMethodAttribute>();
+            if (methoAttr == null) methoAttr = new HttpMethodAttribute("GET");
+
+            if (methoAttr.Method != request.HttpMethod)
+                throw new MethodNotAllowedException();
 
             NameValueCollection queryParams = null;
             if (request.HttpMethod == "GET")

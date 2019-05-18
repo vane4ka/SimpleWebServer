@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\HttpMethodAttribute.cs" />
     <Compile Include="Configurations\IConfigurator.cs" />
     <Compile Include="Exceptions\NotConfigureException.cs" />
     <Compile Include="Exceptions\MvcExceptions.cs" />

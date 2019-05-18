@@ -1,4 +1,5 @@
 ﻿using BooksSite.Services;
+using SimpleWebServer.Attributes;
 using System.Text;
 
 namespace BooksSite.Controllers
@@ -12,6 +13,7 @@ namespace BooksSite.Controllers
             this.bookService = bookService;
         }
 
+        [HttpMethod("GET")]
         public string All()
         {
             StringBuilder str = new StringBuilder();
@@ -25,6 +27,7 @@ namespace BooksSite.Controllers
             return str.ToString();
         }
 
+        [HttpMethod("GET")]
         public string Get(int id)
         {
             Book book = bookService.GetBook(id);
