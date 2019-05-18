@@ -53,7 +53,7 @@ namespace SimpleWebServer.Middlewares
             string actionName = segments[1];
 
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Type controllerType = assembly.GetType($"MyWebServer.Controllers.{controllerName}Controller", false, true);
+            Type controllerType = assembly.GetType($"{data["controllerNS"]}.{controllerName}Controller", false, true);
             if (controllerType == null) throw new NotFoundException();
 
             MethodInfo actionMethod = controllerType.GetMethod(actionName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);

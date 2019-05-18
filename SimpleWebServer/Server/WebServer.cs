@@ -2,6 +2,7 @@
 using SimpleWebServer.Configurations;
 using SimpleWebServer.Exceptions;
 using SimpleWebServer.Middlewares;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace SimpleWebServer.Server
         private HttpListener listener;
         private MiddlewareDelegate firstMiddleware;
         private IContainer container;
+        private string controllerNS;
 
         public WebServer(string url)
         {
@@ -27,6 +29,7 @@ namespace SimpleWebServer.Server
             IConfigurator configurator = new T();
             firstMiddleware = configurator.ConfigureMiddleware();
             container = configurator.ConfigureDIContainer();
+            controllerNS = configurator.SetControllerNamespace();
         }
 
         public void Start()
@@ -39,6 +42,10 @@ namespace SimpleWebServer.Server
             {
                 throw new NotConfigureException("DI container not configure");
             }
+            else if (String.IsNullOrEmpty(controllerNS))
+            {
+                throw new NotConfigureException("Don't set controller namespace");
+            }
             listener.Start();
             while (true)
             {
@@ -49,7 +56,9 @@ namespace SimpleWebServer.Server
 
         private void Process(HttpListenerContext context)
         {
-            firstMiddleware.Invoke(context, container, new Dictionary<string, object>());
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("controllerNS", controllerNS);
+            firstMiddleware.Invoke(context, container, data);
         }
     }
 }
