@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Web;
@@ -25,6 +27,7 @@ namespace SimpleWebServer.Middlewares
             {
                 string res = FindAction(context, container, data);
                 context.Response.StatusCode = 200;
+                context.Response.ContentType = "text/html";
                 using (StreamWriter sw = new StreamWriter(context.Response.OutputStream))
                 {
                     sw.Write(res);
@@ -52,7 +55,8 @@ namespace SimpleWebServer.Middlewares
             string controllerName = segments[0];
             string actionName = segments[1];
 
-            Assembly assembly = Assembly.GetExecutingAssembly();
+            Assembly assembly = Assembly.GetEntryAssembly();
+            
             Type controllerType = assembly.GetType($"{data["controllerNS"]}.{controllerName}Controller", false, true);
             if (controllerType == null) throw new NotFoundException();
 
@@ -62,7 +66,7 @@ namespace SimpleWebServer.Middlewares
             ParameterInfo[] methodParams = actionMethod.GetParameters();
             if (methodParams.Length == 0)
             {
-                return actionMethod.Invoke(Activator.CreateInstance(controllerType), null).ToString();
+                return actionMethod.Invoke(container.Resolve(controllerType), null).ToString();
             }
 
             NameValueCollection queryParams = null;
