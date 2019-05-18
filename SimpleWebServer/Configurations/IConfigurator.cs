@@ -8,5 +8,6 @@ namespace SimpleWebServer.Configurations
         MiddlewareDelegate ConfigureMiddleware();
         IContainer ConfigureDIContainer();
         string SetControllerNamespace();
+        string SetStaticFilesPath();
     }
 }

@@ -39,10 +39,18 @@ namespace SimpleWebServer.Middlewares
                 context.Response.StatusCode = ex.StatusCode;
                 context.Response.Close();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                context.Response.StatusCode = 500;
-                context.Response.Close();
+                if (ex.InnerException is MvcException innerEx)
+                {
+                    context.Response.StatusCode = innerEx.StatusCode;
+                    context.Response.Close();
+                }
+                else
+                {
+                    context.Response.StatusCode = 500;
+                    context.Response.Close();
+                }
             }
         }
 

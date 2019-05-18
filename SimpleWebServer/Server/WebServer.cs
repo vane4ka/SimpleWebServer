@@ -16,6 +16,7 @@ namespace SimpleWebServer.Server
         private MiddlewareDelegate firstMiddleware;
         private IContainer container;
         private string controllerNS;
+        private string staticFilesPath;
 
         public WebServer(string url)
         {
@@ -30,6 +31,7 @@ namespace SimpleWebServer.Server
             firstMiddleware = configurator.ConfigureMiddleware();
             container = configurator.ConfigureDIContainer();
             controllerNS = configurator.SetControllerNamespace();
+            staticFilesPath = configurator.SetStaticFilesPath();
         }
 
         public void Start()
@@ -58,6 +60,7 @@ namespace SimpleWebServer.Server
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("controllerNS", controllerNS);
+            data.Add("staticFilesPath", staticFilesPath);
             firstMiddleware.Invoke(context, container, data);
         }
     }

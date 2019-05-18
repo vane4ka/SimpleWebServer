@@ -53,6 +53,7 @@
     <Compile Include="Middlewares\IMiddleware.cs" />
     <Compile Include="Middlewares\MiddlewareBuilder.cs" />
     <Compile Include="Middlewares\MvcMiddleware.cs" />
+    <Compile Include="Middlewares\StaticFilesMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\WebServer.cs" />
   </ItemGroup>

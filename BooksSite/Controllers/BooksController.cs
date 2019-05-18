@@ -1,5 +1,6 @@
 ﻿using BooksSite.Services;
 using SimpleWebServer.Attributes;
+using SimpleWebServer.Exceptions;
 using System.Text;
 
 namespace BooksSite.Controllers
@@ -31,11 +32,12 @@ namespace BooksSite.Controllers
         public string Get(int id)
         {
             Book book = bookService.GetBook(id);
-            if (book == null) return "<p>no book</p>";
+            if (book == null) throw new NotFoundException();
             return $"<h3>Book info:</h3>" +
                 $"<p>ID: {book.Id}</p>" +
                 $"<p>TITLE: {book.Title}</p>" +
-                $"<p>YEAR: {book.Year}</p>";
+                $"<p>YEAR: {book.Year}</p>" +
+                $"<br/><a href='/books/all'>back to all books</a>";
         }
     }
 }

@@ -3,6 +3,7 @@ using SimpleWebServer.Middlewares;
 using Autofac;
 using BooksSite.Services;
 using BooksSite.Controllers;
+using System.IO;
 
 namespace BooksSite.Configures
 {
@@ -11,6 +12,7 @@ namespace BooksSite.Configures
         public MiddlewareDelegate ConfigureMiddleware()
         {
             return new MiddlewareBuilder()
+                .Add<StaticFilesMiddleware>()
                 .Add<MvcMiddleware>()
                 .Add<Final404Middleware>()
                 .Build();
@@ -27,6 +29,11 @@ namespace BooksSite.Configures
         public string SetControllerNamespace()
         {
             return "BooksSite.Controllers";
+        }
+
+        public string SetStaticFilesPath()
+        {
+            return $@"{Directory.GetCurrentDirectory()}\..\..\wwwroot\";
         }
     }
 }

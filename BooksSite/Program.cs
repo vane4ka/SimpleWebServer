@@ -1,6 +1,7 @@
 ﻿using BooksSite.Configures;
 using SimpleWebServer.Server;
 using System;
+using System.Diagnostics;
 
 namespace BooksSite
 {
@@ -13,6 +14,7 @@ namespace BooksSite
             try
             {
                 Console.WriteLine("server start...");
+                Process.Start("chrome.exe", " http://127.0.0.1:8084/index.html");
                 webServer.Start();
             }
             catch(Exception ex)
