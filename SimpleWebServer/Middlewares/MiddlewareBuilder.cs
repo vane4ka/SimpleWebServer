@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text;
 
 namespace SimpleWebServer.Middlewares
 {
@@ -17,7 +15,7 @@ namespace SimpleWebServer.Middlewares
 
         public MiddlewareDelegate Build()
         {
-            MiddlewareDelegate first = LastInvoke;
+            MiddlewareDelegate first = null;
             while (types.Count > 0)
             {
                 var mw = Activator.CreateInstance(types.Pop()) as IMiddleware;
@@ -25,15 +23,6 @@ namespace SimpleWebServer.Middlewares
                 first = mw.RequestProcessing;
             }
             return first;
-        }
-
-        private void LastInvoke(HttpListenerContext context, Dictionary<string, object> data)
-        {
-            context.Response.ContentType = "text/html";
-            context.Response.StatusCode = 200;
-            byte[] bytes = Encoding.Default.GetBytes("<p>no handler</p>");
-            context.Response.OutputStream.Write(bytes, 0, bytes.Length);
-            context.Response.OutputStream.Close();
         }
     }
 }

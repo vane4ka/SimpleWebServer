@@ -1,4 +1,5 @@
-﻿using SimpleWebServer.Configurations;
+﻿using Autofac;
+using SimpleWebServer.Configurations;
 using SimpleWebServer.Exceptions;
 using SimpleWebServer.Middlewares;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace SimpleWebServer.Server
         private string url;
         private HttpListener listener;
         private MiddlewareDelegate firstMiddleware;
+        private IContainer container;
 
         public WebServer(string url)
         {
@@ -24,6 +26,7 @@ namespace SimpleWebServer.Server
         {
             IConfigurator configurator = new T();
             firstMiddleware = configurator.ConfigureMiddleware();
+            container = configurator.ConfigureDIContainer();
         }
 
         public void Start()
@@ -31,6 +34,10 @@ namespace SimpleWebServer.Server
             if (firstMiddleware == null)
             {
                 throw new NotConfigureException("Pipeline is empty");
+            }
+            else if (container == null)
+            {
+                throw new NotConfigureException("DI container not configure");
             }
             listener.Start();
             while (true)
@@ -42,7 +49,7 @@ namespace SimpleWebServer.Server
 
         private void Process(HttpListenerContext context)
         {
-            firstMiddleware.Invoke(context, new Dictionary<string, object>());
+            firstMiddleware.Invoke(context, container, new Dictionary<string, object>());
         }
     }
 }
