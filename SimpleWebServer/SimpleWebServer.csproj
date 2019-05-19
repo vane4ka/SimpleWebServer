@@ -45,10 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\AuthAttribute.cs" />
     <Compile Include="Attributes\HttpMethodAttribute.cs" />
     <Compile Include="Configurations\IConfigurator.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Exceptions\NotConfigureException.cs" />
     <Compile Include="Exceptions\MvcExceptions.cs" />
+    <Compile Include="Middlewares\AuthCookieMiddleware.cs" />
     <Compile Include="Middlewares\FinalMiddleware.cs" />
     <Compile Include="Middlewares\IMiddleware.cs" />
     <Compile Include="Middlewares\MiddlewareBuilder.cs" />

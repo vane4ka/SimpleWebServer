@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Web;
 using Autofac;
 using SimpleWebServer.Attributes;
+using SimpleWebServer.Controllers;
 using SimpleWebServer.Exceptions;
 
 namespace SimpleWebServer.Middlewares
@@ -73,8 +74,6 @@ namespace SimpleWebServer.Middlewares
             if (actionMethod == null) throw new NotFoundException();
 
             ParameterInfo[] methodParams = actionMethod.GetParameters();
-            if (methodParams.Length == 0)
-                return actionMethod.Invoke(container.Resolve(controllerType), null).ToString();
 
             HttpMethodAttribute methoAttr = actionMethod.GetCustomAttribute<HttpMethodAttribute>();
             if (methoAttr == null) methoAttr = new HttpMethodAttribute("GET");
@@ -82,39 +81,48 @@ namespace SimpleWebServer.Middlewares
             if (methoAttr.Method != request.HttpMethod)
                 throw new MethodNotAllowedException();
 
-            NameValueCollection queryParams = null;
-            if (request.HttpMethod == "GET")
+            List<object> paramToMethod = new List<object>();
+            if (methodParams.Length != 0)
             {
-                string query = request.Url.Query;
-                if (String.IsNullOrEmpty(query) && actionMethod.GetParameters().Length != 0)
+                NameValueCollection queryParams = null;
+                if (request.HttpMethod == "GET")
+                {
+                    string query = request.Url.Query;
+                    if (String.IsNullOrEmpty(query) && actionMethod.GetParameters().Length != 0)
+                        throw new BadRequestException();
+
+                    if (!String.IsNullOrEmpty(query))
+                        queryParams = HttpUtility.ParseQueryString(query);
+                }
+                else if (request.HttpMethod == "POST")
+                {
+                    using (StreamReader reader = new StreamReader(request.InputStream))
+                    {
+                        string res = reader.ReadToEnd();
+                        queryParams = HttpUtility.ParseQueryString(res);
+                    }
+                }
+
+                if (queryParams == null || queryParams.Count < methodParams.Length)
                     throw new BadRequestException();
 
-                if (!String.IsNullOrEmpty(query))
-                    queryParams = HttpUtility.ParseQueryString(query);
-            }
-            else if (request.HttpMethod == "POST")
-            {
-                using (StreamReader reader = new StreamReader(request.InputStream))
+                foreach (var p in methodParams)
                 {
-                    string res = reader.ReadToEnd();
-                    queryParams = HttpUtility.ParseQueryString(res);
+                    paramToMethod.Add(Convert.ChangeType(queryParams[p.Name], p.ParameterType));
                 }
+
+                if (paramToMethod.Count != methodParams.Length)
+                    throw new BadRequestException();
             }
 
-            if (queryParams == null || queryParams.Count < methodParams.Length)
-                throw new BadRequestException();
+            AuthAttribute authAttr = actionMethod.GetCustomAttribute<AuthAttribute>();
+            if (authAttr != null && (data["isAuth"] == null || Convert.ToBoolean(data["isAuth"]) == false))
+                throw new UnauthorizedException();
 
-            List<object> paramToMethod = new List<object>();
-
-            foreach (var p in methodParams)
-            {
-                paramToMethod.Add(Convert.ChangeType(queryParams[p.Name], p.ParameterType));
-            }
-
-            if (paramToMethod.Count != methodParams.Length)
-                throw new BadRequestException();
-
-            return actionMethod.Invoke(container.Resolve(controllerType), paramToMethod.ToArray()).ToString();
+            BaseController controller = container.Resolve(controllerType) as BaseController;
+            controller.Request = context.Request;
+            controller.Response = context.Response;
+            return actionMethod.Invoke(controller, paramToMethod.ToArray()).ToString();
         }
     }
 }

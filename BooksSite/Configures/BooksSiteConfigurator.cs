@@ -12,6 +12,7 @@ namespace BooksSite.Configures
         public MiddlewareDelegate ConfigureMiddleware()
         {
             return new MiddlewareBuilder()
+                .Add<AuthCookieMiddleware>()
                 .Add<StaticFilesMiddleware>()
                 .Add<MvcMiddleware>()
                 .Add<Final404Middleware>()
@@ -23,6 +24,7 @@ namespace BooksSite.Configures
             ContainerBuilder builder = new ContainerBuilder();
             builder.RegisterType<BookService>().As<IBookService>();
             builder.RegisterType<BooksController>();
+            builder.RegisterType<UsersController>();
             return builder.Build();
         }
 

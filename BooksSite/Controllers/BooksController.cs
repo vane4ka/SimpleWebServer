@@ -1,11 +1,12 @@
 ﻿using BooksSite.Services;
 using SimpleWebServer.Attributes;
+using SimpleWebServer.Controllers;
 using SimpleWebServer.Exceptions;
 using System.Text;
 
 namespace BooksSite.Controllers
 {
-    public class BooksController
+    public class BooksController : BaseController
     {
         private IBookService bookService;
 
