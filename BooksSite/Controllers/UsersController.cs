@@ -1,5 +1,6 @@
 ﻿using SimpleWebServer.Attributes;
 using SimpleWebServer.Controllers;
+using System;
 using System.Net;
 
 namespace BooksSite.Controllers
@@ -19,9 +20,10 @@ namespace BooksSite.Controllers
         [HttpMethod("POST")]
         public string LoginProcess(string username)
         {
-            Response.SetCookie(new Cookie("username", username));
+            Response.SetCookie(new Cookie("username", username, "/") { Expires = DateTime.Now.AddDays(1) });
             return $"<a href='/users/page'>user page</a><br/>" +
                 $"<a href='/books/all'>all books</a><br/>" +
+                $"<a href='/books/add'>new book</a><br/>" +
                 $"<a href='/users/logout'>logout</a><br/>";
         }
         [Auth]
@@ -31,6 +33,7 @@ namespace BooksSite.Controllers
             string username = Request.Cookies["username"]?.Value ?? "anonim";
             return $"<h3>Hello, {username}!</h3>" +
                 $"<a href='/books/all'>all books</a><br/>" +
+                $"<a href='/books/add'>new book</a><br/>" +
                 $"<a href='/users/logout'>logout</a><br/>"; 
         }
 
